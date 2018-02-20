@@ -7,39 +7,29 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: 'Anonumouse',
-      messages: [{
-        id: 1,
-        type: 'system',
-        text: 'Anonumouse changed their name to bob'
-      }, {
-        id: 2,
-        type: 'user',
-        text: 'hi',
-        user: 'bob'
-      }]
+      currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
+      messages: [
+        {
+          username: "Bob",
+          content: "Has anyone seen my marbles?",
+          id: 1
+        },
+        {
+          username: "Anonymous",
+          content: "No, I think you lost them. You lost your marbles Bob. You lost them for good.",
+          id: 2
+        }
+      ]
     };
   }
 
-  newMessage(messageText) {
-    const newMessageObject = {
-      id: Math.random(),
-      type: 'user',
-      user: this.state.user,
-      text: messageText
-    };
-    const newMessages = this.state.messages.concat(newMessageObject);
-    this.setState({
-      messages: newMessages
-    });
-  }
 
   render() {
     return (
       <div>
         <Navbar />
-        <MessageList messages={this.state.messages} />
-        <Chatbar newMessage={this.newMessage.bind(this)} />
+        <MessageList  messages={this.state.messages}/>
+        <Chatbar  currentUser={this.state.currentUser.name}/>
       </div>
     );
   }
