@@ -4,23 +4,26 @@ class MessageList extends Component {
 
     constructor(props) {
         super(props);
-        console.log("messages", this.props.messages);
     }
 
     render() {
-        const messages = this.props.messages.map((message) => {
-          return (
-            <div key={message.id} className="message">
-              <span className="message-username">{message.username}</span>
-              <span className="message-content">{message.content}</span>
-            </div>
-            // <div className="message system">
-            //   Anonymous1 changed their name to nomnom.
-            // </div>
-          )
-
-        });
-
+      console.log("rendering <messages>");
+          const messages = this.props.messages.map((message) => {
+            if(message.type === "Message") {
+              return (
+                <div key={message.id} className="message">
+                  <span className="message-username">{message.username}</span>
+                  <span className="message-content">{message.content}</span>
+                </div>
+              )
+            } else {
+              return (
+                <div key={message.id} className="message system">
+                 <span> {message.username} changed their name to {message.content}.</span>
+                </div>
+              )
+            }
+          });
         return (
           <main className="messages">
             {messages}
@@ -30,3 +33,4 @@ class MessageList extends Component {
 }
 
 export default MessageList;
+
