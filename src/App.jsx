@@ -8,9 +8,10 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentUser: {name: "Anonymous"}, // optional. if currentUser is not defined, it means the user is Anonymous
+      currentUser: {name: "Bob"},
+      userColor: "#000",
       messages: [],
-      serverMessage:[]
+      numberOfUsers:[]
     };
   }
 
@@ -26,9 +27,7 @@ class App extends Component {
       content: notificationText,
       username: this.state.currentUser.name
     };
-    if(notification.username !== "Anonymous") {
       this.chatSocket.send(JSON.stringify(notification));
-    }
   }
 
 // Creating new user message
@@ -52,30 +51,42 @@ class App extends Component {
     console.log("Connected to server");
     console.log("componentDidMount <App />");
 
+    // Sending name of current user
+    const msg = {
+      user: this.state.currentUser.name
+    }
     // Receiving message from WebSocket
     this.chatSocket.onmessage =  (event) => {
       console.log(event.data);
       const msgReceived = JSON.parse(event.data)
       console.log("this is the type of msg:",msgReceived.type);
 
-      // Displaying message to all users
-      if(msgReceived.type === 'Message'){
+      // Displaying message
+      if(msgReceived.type === 'Message' || msgReceived.type === 'Notification'){
         const newMessages = this.state.messages.concat(msgReceived);
         this.setState({
           messages: newMessages
         });
-      }else if(msgReceived.type === 'Notification'){
+      }else if(msgReceived.type === 'userJoined'){
+        // this.setState({
+        //   numberOfUsers: msgReceived.users
+        // });
         const newMessages = this.state.messages.concat(msgReceived);
         this.setState({
+          numberOfUsers: msgReceived.users,
           messages: newMessages
         });
-      }else if (msgReceived.type === 'serverMessage'){
-        console.log("Number of users", msgReceived.users);
+      }else if(msgReceived.type === 'userLeft') {
+        const newMessages = this.state.messages.concat(msgReceived);
         this.setState({
-          serverMessage: msgReceived.users
+          numberOfUsers: msgReceived.users,
+          messages: newMessages
         });
-      }
-      else {
+      }else if(msgReceived.type === 'serverChangeColor') {
+        this.setState({
+          userColor: msgReceived.color
+        });
+      }else {
         throw new Error("Unknown event type " + msgReceived.type);
       }
     }
@@ -85,8 +96,10 @@ class App extends Component {
     console.log("rendering <app>");
     return (
       <div>
-        <Navbar numberOfUsers={this.state.serverMessage}/>
-        <MessageList  messages={this.state.messages}/>
+        <Navbar numberOfUsers={this.state.numberOfUsers}/>
+        <MessageList  userColor={this.state.userColor}
+                      messages={this.state.messages}
+                      numberOfUsers={this.state.numberOfUsers}/>
         <Chatbar  username={this.newName.bind(this)}
                   newMessage={this.newMessage.bind(this)}
                   newNotification={this.newNotification.bind(this)}/>
