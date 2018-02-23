@@ -8,8 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentUser: {name: "Bob"},
-      userColor: "#000",
+      currentUser: {name: "Bob", userColor: "#000"},
       messages: [],
       numberOfUsers:[]
     };
@@ -27,7 +26,7 @@ class App extends Component {
       content: notificationText,
       username: this.state.currentUser.name
     };
-      this.chatSocket.send(JSON.stringify(notification));
+    this.chatSocket.send(JSON.stringify(notification));
   }
 
 // Creating new user message
@@ -41,7 +40,7 @@ class App extends Component {
           type: "Message",
           content: newMessageObject.content,
           username: newMessageObject.username,
-        };
+    };
     this.chatSocket.send(JSON.stringify(msg));
   }
 
@@ -59,7 +58,6 @@ class App extends Component {
     this.chatSocket.onmessage =  (event) => {
       console.log(event.data);
       const msgReceived = JSON.parse(event.data)
-      console.log("this is the type of msg:",msgReceived.type);
 
       // Displaying message
       if(msgReceived.type === 'Message' || msgReceived.type === 'Notification'){
@@ -67,25 +65,15 @@ class App extends Component {
         this.setState({
           messages: newMessages
         });
-      }else if(msgReceived.type === 'userJoined'){
-        // this.setState({
-        //   numberOfUsers: msgReceived.users
-        // });
-        const newMessages = this.state.messages.concat(msgReceived);
-        this.setState({
-          numberOfUsers: msgReceived.users,
-          messages: newMessages
-        });
-      }else if(msgReceived.type === 'userLeft') {
+      }else if(msgReceived.type === 'userJoined' || msgReceived.type === 'userLeft'){
         const newMessages = this.state.messages.concat(msgReceived);
         this.setState({
           numberOfUsers: msgReceived.users,
           messages: newMessages
         });
       }else if(msgReceived.type === 'serverChangeColor') {
-        this.setState({
-          userColor: msgReceived.color
-        });
+        console.log("COLOR RECEIVED FROM SERVER: ", msgReceived.color);
+        this.setState({currentUser: {...this.state.currentUser, userColor:msgReceived.color}});
       }else {
         throw new Error("Unknown event type " + msgReceived.type);
       }
@@ -97,9 +85,10 @@ class App extends Component {
     return (
       <div>
         <Navbar numberOfUsers={this.state.numberOfUsers}/>
-        <MessageList  userColor={this.state.userColor}
+        <MessageList  userColor={this.state.currentUser}
                       messages={this.state.messages}
-                      numberOfUsers={this.state.numberOfUsers}/>
+                      numberOfUsers={this.state.numberOfUsers}
+                      currentUser={this.state.currentUser}/>
         <Chatbar  username={this.newName.bind(this)}
                   newMessage={this.newMessage.bind(this)}
                   newNotification={this.newNotification.bind(this)}/>
