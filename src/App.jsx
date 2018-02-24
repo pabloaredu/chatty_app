@@ -48,7 +48,6 @@ class App extends Component {
   // Opening WebSocket
     this.chatSocket = new WebSocket("ws://localhost:3001", "protocolOne");
     console.log("Connected to server");
-    console.log("componentDidMount <App />");
 
     // Sending name of current user
     const msg = {
@@ -56,10 +55,9 @@ class App extends Component {
     }
     // Receiving message from WebSocket
     this.chatSocket.onmessage =  (event) => {
-      console.log(event.data);
       const msgReceived = JSON.parse(event.data)
 
-      // Displaying message
+      // Handling message
       if(msgReceived.type === 'Message' || msgReceived.type === 'Notification'){
         const newMessages = this.state.messages.concat(msgReceived);
         this.setState({
@@ -71,9 +69,10 @@ class App extends Component {
           numberOfUsers: msgReceived.users,
           messages: newMessages
         });
-      }else if(msgReceived.type === 'serverChangeColor') {
-        console.log("COLOR RECEIVED FROM SERVER: ", msgReceived.color);
-        this.setState({currentUser: {...this.state.currentUser, userColor:msgReceived.color}});
+      // WORK IN PROGRESS: USER NAME COLOR
+      // }else if(msgReceived.type === 'serverChangeColor') {
+      //   console.log("COLOR RECEIVED FROM SERVER: ", msgReceived.color);
+      //   this.setState({currentUser: {...this.state.currentUser, userColor:msgReceived.color}});
       }else {
         throw new Error("Unknown event type " + msgReceived.type);
       }
@@ -81,7 +80,6 @@ class App extends Component {
   }
 
   render() {
-    console.log("rendering <app>");
     return (
       <div>
         <Navbar numberOfUsers={this.state.numberOfUsers}/>

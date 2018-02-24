@@ -17,7 +17,6 @@ class Chatbar extends Component {
   }
 
   render() {
-    console.log("rendering <chatbar>");
     return (
       <footer className="chatbar">
         <input className="chatbar-username"

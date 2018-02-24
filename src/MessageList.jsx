@@ -7,9 +7,7 @@ class MessageList extends Component {
     }
 
     render() {
-      console.log("COLOR IN NAME AS INLINE STYLE: ", this.props.currentUser.userColor);
       const nameColor = {color: this.props.currentUser.userColor};
-      console.log("rendering <messages>");
           const messages = this.props.messages.map((message) => {
             if(message.type === "Message") {
               return (
